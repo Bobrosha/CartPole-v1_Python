@@ -75,64 +75,53 @@ class Agent():
         if self.exploration_rate > self.exploration_min: 
             self.exploration_rate *= self.exploration_decay
             
-def play():
-    env = gym.make('CartPole-v1') # Создаем среду
+env = gym.make('CartPole-v1') # Создаем среду
     
-    observ_space = env.observation_space.shape[0]
-    action_space = env.action_space.n
+observ_space = env.observation_space.shape[0]
+action_space = env.action_space.n
     
     # DQN - глубокая Q-нейронная сеть
-    agent = Agent(observ_space, action_space) # Создаем агента
+agent = Agent(observ_space, action_space) # Создаем агента
     
-    episodes = 500 # Число игровых эпизодов
+episodes = 500 # Число игровых эпизодов
     
-    scores = deque(maxlen = 100)
+scores = deque(maxlen = 100)
     # scores - хранит длительность последних 100 игр
     
     #
     # Цикл игры и обучения
     #
 
-    for e in range(episodes + 1):
+for e in range(episodes + 1):
         # Получаем начальное состояние объекта перед началом каждой игры (каждого эпизода)
-        state = env.reset()
-        # state[0] - позиция тележки
-        # state[1] - скорость тележки
-        # state[2] - угол отклонения шеста от вертикали в радианах
-        # state[3] - скорость изменения угла наклона шеста
+    state = env.reset()
         
-        state = np.reshape(state, [1, observ_space])
+    state = np.reshape(state, [1, observ_space])
         
-        frames = 0
-        done = False
+    frames = 0
+    done = False
         
-        while not done:
-            env.render() # Графическое отображение симуляции
-            frames += 1
-            action = agent.action(state) # Определяем очередное действие
+    while not done:
+        #env.render() # Графическое отображение симуляции
+        frames += 1
+        action = agent.action(state) # Определяем очередное действие
             
-            state_next, reward, done, info = env.step(action)
-            # Получаем от среды обновленные состояние объекта, награду, значение флага завершения игры
-            # В каждый момент игры, пока не наступило одно из условий ее прекращения, награда равна 1
+        state_next, reward, done, info = env.step(action)
+            # Получаем от среды обновленное состояние
             
-            state_next = np.reshape(state_next, [1, observ_space])
+        state_next = np.reshape(state_next, [1, observ_space])
             
-            agent.remember(state, action, reward, state_next, done)
-            # Запоминаем предыдущее состояние объекта, действие, 
-            # награду за это действие, текущее состояние, значение done
+        agent.remember(state, action, reward, state_next, done)
+            # Запоминаем предыдущее состояние
             
-            state = state_next # Обновляем текущее состояние
+        state = state_next # Обновляем текущее состояние
             
-        print("Эпизод: {:>3}/{}, продолжительность игры в кадрах: {:>3}".format(e, episodes, frames))
+    print("Эпизод: {:>3}/{}, продолжительность игры в кадрах: {:>3}".format(e, episodes, frames))
         
-        scores.append(frames)
-        score_mean = np.mean(scores)
+    scores.append(frames)
+    score_mean = np.mean(scores)
             
-        print('Средняя продолжительность: ', score_mean, '\n')
+    print('Средняя продолжительность: ', score_mean, '\n')
         
-        # Продолжаем обучать агента
-        agent.training(32)
-        
-    return 'Simulation complited'
-    
-play()
+    # Продолжаем обучать агента
+    agent.training(32)
